@@ -76,7 +76,7 @@ export default function OwnerDashboardPage() {
     <>
       <div className="page-header">
         <h1>My menu</h1>
-        {!formOpen && <button onClick={openAddForm}>Add product</button>}
+        {!formOpen && <button onClick={openAddForm}>Add a dish</button>}
       </div>
 
       {formOpen && (

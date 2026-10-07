@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { placeOrder } from "../api.js";
 import { CART_EVENT, changeQuantity, clearCart, getCart, removeFromCart } from "../cart.js";
+import { stallStyle } from "../stall.js";
 
 export default function CartPage() {
   const [items, setItems] = useState(getCart());
@@ -47,11 +48,13 @@ export default function CartPage() {
     return (
       <>
         <h1>Order placed</h1>
-        <div className="notice-box">
+        <div className="ticket">
+          <p className="ticket-label">Order number</p>
+          <p className="ticket-number">{placedOrder.order_number}</p>
           <p>
-            Thank you, {placedOrder.customer_name}! Your order <strong>{placedOrder.order_number}</strong> for table{" "}
-            {placedOrder.table_number} is placed. Total: {placedOrder.total.toFixed(2)}
+            Thank you, {placedOrder.customer_name}. Your order for table {placedOrder.table_number} is placed.
           </p>
+          <p className="ticket-total">Total {placedOrder.total.toFixed(2)}</p>
         </div>
         <p>
           <Link to="/">Order from another shop</Link>
@@ -73,7 +76,7 @@ export default function CartPage() {
 
   const byShop = Object.values(
     items.reduce((groups, item) => {
-      if (!groups[item.shopId]) groups[item.shopId] = { name: item.shopName, items: [] };
+      if (!groups[item.shopId]) groups[item.shopId] = { id: item.shopId, name: item.shopName, items: [] };
       groups[item.shopId].items.push(item);
       return groups;
     }, {})
@@ -86,33 +89,43 @@ export default function CartPage() {
       <h1>Your cart</h1>
 
       {byShop.map((group) => (
-        <section key={group.name}>
+        <section key={group.id} className="cart-stall" style={stallStyle(group.id)}>
           <h2>{group.name}</h2>
-          <div className="product-list">
+          <ul className="cart-lines">
             {group.items.map((item) => (
-              <div key={item.productId} className="card row">
-                <div className="row-info">
+              <li key={item.productId} className="cart-line">
+                <div className="cart-line-info">
                   <strong>{item.name}</strong>
-                  <div className="cuisine">{item.price.toFixed(2)} each</div>
+                  <span className="muted">{item.price.toFixed(2)} each</span>
                 </div>
-                <div className="row-actions">
-                  <div className="qty">
-                    <button className="secondary" onClick={() => changeQuantity(item.productId, -1)}>
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button className="secondary" onClick={() => changeQuantity(item.productId, 1)}>
-                      +
-                    </button>
-                  </div>
-                  <span className="price">{(item.price * item.quantity).toFixed(2)}</span>
-                  <button className="danger" onClick={() => removeFromCart(item.productId)}>
-                    Remove
+                <div className="qty">
+                  <button
+                    className="secondary"
+                    aria-label={`Decrease quantity of ${item.name}`}
+                    onClick={() => changeQuantity(item.productId, -1)}
+                  >
+                    -
+                  </button>
+                  <span aria-live="polite">{item.quantity}</span>
+                  <button
+                    className="secondary"
+                    aria-label={`Increase quantity of ${item.name}`}
+                    onClick={() => changeQuantity(item.productId, 1)}
+                  >
+                    +
                   </button>
                 </div>
-              </div>
+                <span className="price">{(item.price * item.quantity).toFixed(2)}</span>
+                <button
+                  className="link-button"
+                  aria-label={`Remove ${item.name}`}
+                  onClick={() => removeFromCart(item.productId)}
+                >
+                  Remove
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       ))}
 
@@ -123,18 +136,19 @@ export default function CartPage() {
         </button>
       </div>
 
-      <form className="form-card card" onSubmit={handlePlaceOrder}>
+      <form className="form-card card checkout" onSubmit={handlePlaceOrder}>
         <h2>Place order</h2>
 
         <label>
           Your name
-          <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+          <input value={customerName} autoComplete="name" onChange={(e) => setCustomerName(e.target.value)} />
         </label>
 
         <label>
           Table number
           <input
             type="number"
+            inputMode="numeric"
             min="1"
             step="1"
             value={tableNumber}
@@ -149,9 +163,7 @@ export default function CartPage() {
         </button>
       </form>
 
-      <p className="cuisine">
-        Prices are the ones shown when you added the items. No payment is taken.
-      </p>
+      <p className="muted">Prices are the ones shown when you added the items. No payment is taken.</p>
     </>
   );
 }

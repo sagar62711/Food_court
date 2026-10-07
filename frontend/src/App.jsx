@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/Header.jsx";
+import LiquidBackground from "./components/LiquidBackground.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
@@ -11,6 +12,7 @@ import ShopPage from "./pages/ShopPage.jsx";
 export default function App() {
   return (
     <BrowserRouter>
+      <LiquidBackground />
       <Header />
       <main className="container">
         <Routes>

@@ -23,7 +23,9 @@ export default function Header() {
 
   return (
     <header className="site-header">
-      <Link to="/">Food Court</Link>
+      <Link to="/" className="brand">
+        Food Court
+      </Link>
       <nav>
         {user ? (
           <>
@@ -32,8 +34,12 @@ export default function Header() {
           </>
         ) : (
           <>
-            <Link to="/cart">Cart ({count})</Link>
-            <Link to="/login">Staff login</Link>
+            <Link to="/cart" className="cart-link" aria-label={`Cart, ${count} items`}>
+              Cart <span className="cart-count">{count}</span>
+            </Link>
+            <Link to="/login" className="staff-link">
+              Staff login
+            </Link>
           </>
         )}
       </nav>
