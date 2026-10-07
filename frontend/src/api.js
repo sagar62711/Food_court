@@ -1,6 +1,6 @@
 import { clearToken, getToken } from "./auth.js";
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 async function request(path, { method = "GET", body, auth = false } = {}) {
   const headers = {};
